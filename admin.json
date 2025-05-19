@@ -258,15 +258,7 @@
         {
             "Type": "Get",
             "Name": "Global Variables",
-            "SQL": "SELECT INS.InstanceID, WHS.WarehouseID, TNT.TenantID, CONCAT(WHS.WarehouseCode,'_',TNT.TenantCode,'_',NOW()) AS BuiltByMvi FROM INS INNER JOIN WHS ON INS.InstanceID = WHS.InstanceID INNER JOIN TNT ON INS.InstanceID = TNT.InstanceID  WHERE INS.InstanceCode = :InstanceCode AND WHS.WarehouseCode = :WarehouseCode AND TNT.TenantCode = :TenantCode"
-        },
-        {
-            "Type": "Function_UpsertGenericAttributeForRecord",
-            "Name": "Set BultByMVI",
-            "ReferenceIDParameter": "InstanceID",
-            "ReferenceType": "INS",
-            "AttributeName": "BultByMVI",
-            "AttributeValueParameter": "BuiltByMvi"
+            "SQL": "SELECT INS.InstanceID, WHS.WarehouseID, TNT.TenantID FROM INS INNER JOIN WHS ON INS.InstanceID = WHS.InstanceID INNER JOIN TNT ON INS.InstanceID = TNT.InstanceID  WHERE INS.InstanceCode = :InstanceCode AND WHS.WarehouseCode = :WarehouseCode AND TNT.TenantCode = :TenantCode"
         },
         {
             "Type": "Command",
@@ -307,6 +299,21 @@
             "Type": "Command",
             "Name": "Delete Receipt loop back",
             "SQL": "DELETE EXP FROM EXP INNER JOIN EXP1 ON EXP1.ExportFileTypeID = EXP.ExportFileTypeID WHERE EXP1.ExportFileTypeFunction = 'StockReceiptPendingLoopbackXML' AND EXP.InstanceID = :InstanceID AND EXP.WarehouseID = :WarehouseID AND EXP.TenantID = :TenantID;"
+        },
+        {
+            "Type": "Command",
+            "Name": "Create Base MVI settings for reporting",
+            "SQL": "INSERT IGNORE INTO `SET` ( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID, :WarehouseID, :TenantID, 'InstanceDeploymentCreateTime', 'InstanceDeploymentCreateTime', 'Text', NULL, NULL, 0 ), ( :InstanceID, :WarehouseID, :TenantID, 'InstanceDeploymentConfig', 'InstanceDeploymentConfig', 'Text', NULL, NULL, 0 );"
+        },
+        {
+            "Type": "Command",
+            "Name": "Update InstanceDeploymentCreateTime",
+            "SQL": "UPDATE `SET` SET SettingValue = NOW() WHERE InstanceID = :InstanceID AND WarehouseID = :WarehouseID AND TenantID = :TenantID AND SettingName = 'InstanceDeploymentCreateTime'"
+        },
+        {
+            "Type": "Command",
+            "Name": "Update InstanceDeploymentConfig",
+            "SQL": "UPDATE `SET` SET SettingValue = JSON_OBJECT( 'DangerousGoods', CAST(:DangerousGoods AS CHAR), 'ItemTrackers', CAST(:ItemTrackers AS CHAR), 'ManualItem', CAST(:ManualItem AS CHAR), 'StockAdjustmentReasonCodes', CAST(:StockAdjustmentReasonCodes AS CHAR), 'StockHoldReasons', CAST(:StockHoldReasons AS CHAR), 'RandomReceipts', CAST(:RandomReceipts AS CHAR), 'ManualReceipts', CAST(:ManualReceipts AS CHAR), 'BulkReceipts', CAST(:BulkReceipts AS CHAR), 'EditReceipts', CAST(:EditReceipts AS CHAR), 'BlockOverReceipt', CAST(:BlockOverReceipt AS CHAR), 'ReceiptLoopback', CAST(:ReceiptLoopback AS CHAR), 'PutawayMergeBulk', CAST(:PutawayMergeBulk AS CHAR), 'PutawayMergePicking', CAST(:PutawayMergePicking AS CHAR), 'AutoReplen', CAST(:AutoReplen AS CHAR), 'CarrierEstimation', CAST(:CarrierEstimation AS CHAR), 'DefaultPickMethod', CAST(:DefaultPickMethod AS CHAR), 'DefaultPackMethod', CAST(:DefaultPackMethod AS CHAR), 'PickingMethodology', CAST(:PickingMethodology AS CHAR), 'ManualOrders', CAST(:ManualOrders AS CHAR), 'EditOrders', CAST(:EditOrders AS CHAR), 'AllowCancelAfterPicking', CAST(:AllowCancelAfterPicking AS CHAR), 'OrderLoopback', CAST(:OrderLoopback AS CHAR), 'Waving', CAST(:Waving AS CHAR), 'FullPalletPicking', CAST(:FullPalletPicking AS CHAR), 'PalletTypeTracking', CAST(:PalletTypeTracking AS CHAR), 'CartonNextGen', CAST(:CartonNextGen AS CHAR), 'PalletNextGen', CAST(:PalletNextGen AS CHAR) ) WHERE InstanceID = :InstanceID AND WarehouseID = :WarehouseID AND TenantID = :TenantID AND SettingName = 'InstanceDeploymentConfig';"
         },
         {
             "Type": "Command",
@@ -627,14 +634,12 @@
                     "Name": "Create Waving",
                     "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID, 'WavePick.Active', 'WavePick Active', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowCustomerCode', 'ShowCustomerCode', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowJobType', 'ShowJobType', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowAssignedUser', 'ShowJobType', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowPackerMessage', 'ShowPackerMessage', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowAssignedUser', 'ShowAssignedUser', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowPickMethod', 'ShowPickMethod', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowPriority', 'ShowPriority', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowTrolleyNumber', 'ShowTrolleyNumber', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WaveDetail.AllowBulkReprint', 'AllowBulkReprint', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.CheckATP', 'CheckATP', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WavePick.ATPDropdown', 'CheckATP', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WavePick.PickToCarton.CompleteAfterWave', 'CompleteAfterWave', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Waves.MarkReleasedOnFirstOpen', 'MarkReleasedOnFirstOpen', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WavePick.ArraySort.CompleteIfSingleItem', 'WavePick.ArraySort.CompleteIfSingleItem', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WebUI.WaveBuilder.ShowPrinters', 'WebUI.WaveBuilder.ShowPrinters', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'CartonisationSetup.Active', 'CartonisationSetup.Active', 'Select', 'Yes,No', 'Yes', '0' );"
                 },
-				
-				
-				   {
+                {
                     "Type": "Command",
                     "Name": "Create Cluster EXP1",
                     "SQL": "INSERT INTO `EXP1` (`ExportFileTypeID`, `InstanceID`, `ExportFileTypeCode`, `TriggerAfter`, `ExportFileTypeName`, `ExportFileTypeFormat`, `ExportFileTypeFunction`, `ExportFileSQL`, `ExportFileNameSQL`, `ExportFileDocumentNumberSQL`, `ExportFileConfiguration`) VALUES (NULL, NULL, NULL, 'WVE_CREATE', 'Wave Ticket', 'Label', 'WaveTicketLabel', NULL, NULL, NULL, NULL) "
                 },
-				   {
+                {
                     "Type": "Command",
                     "Name": "Create Waving EXP",
                     "SQL": "INSERT IGNORE INTO `EXP` (`InstanceID`, `TenantID`, `WarehouseID`, `ExportFileTypeID`, `ExportFileSaveDriver`, `ExportFileSavePath`, `ExportFileConditions`, `ExportConfiguration`)  (SELECT :InstanceID,:TenantID, :WarehouseID, EXP1.ExportFileTypeID, 'Label Print', 'SelectedPrinter', NULL, NULL FROM EXP1 WHERE EXP1.ExportFileTypeFunction = 'WaveTicketLabel' AND EXP1.InstanceID IS NULL AND EXP1.TriggerAfter = 'WVE_CREATE' ORDER BY EXP1.ExportFileTypeID DESC LIMIT 1)"
