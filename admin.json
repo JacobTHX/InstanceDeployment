@@ -1,0 +1,698 @@
+{
+    "AllClusters": false,
+    "Parameters": [
+        {
+            "Name": "InstanceCode",
+            "Type": "Text"
+        },
+        {
+            "Name": "WarehouseCode",
+            "Type": "Text"
+        },
+        {
+            "Name": "TenantCode",
+            "Type": "Text"
+        },
+        {
+            "Name": "DangerousGoods",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "ItemTrackers",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "ManualItem",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "StockAdjustmentReasonCodes",
+            "Type": "Text"
+        },
+        {
+            "Name": "StockHoldReasons",
+            "Type": "Text"
+        },
+        {
+            "Name": "RandomReceipts",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "ManualReceipts",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "BulkReceipts",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "EditReceipts",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "BlockOverReceipt",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "ReceiptLoopback",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "PutawayMergeBulk",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "PutawayMergePicking",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "AutoReplen",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "CarrierEstimation",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "DefaultPickMethod",
+            "Type": "Select",
+            "FieldOptions": [
+                "Exact",
+                "Partial",
+                "Random",
+                "Inline_Exact",
+                "Inline_Partial"
+            ]
+        },
+        {
+            "Name": "DefaultPackMethod",
+            "Type": "Select",
+            "FieldOptions": [
+                "Manual",
+                "Carton",
+                "ManualPackagingSelect",
+                "Pallet",
+                "RainbowPallet",
+                "AdminTask",
+                "AutoConsignment"
+            ]
+        },
+        {
+            "Name": "PickingMethodology",
+            "Type": "Select",
+            "FieldOptions": [
+                "Optimistic",
+                "PickPathSeq",
+                "FIFO",
+                "LIFO",
+                "FEFO",
+                "LEFO",
+                "FPFO",
+                "FBFO",
+                "FPRFO",
+                "Score",
+                "LowestQuantityPicking"
+            ]
+        },
+        {
+            "Name": "ManualOrders",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "EditOrders",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "AllowCancelAfterPicking",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "OrderLoopback",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "Waving",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "FullPalletPicking",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "PalletTypeTracking",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "CartonNextGen",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        },
+        {
+            "Name": "PalletNextGen",
+            "Type": "Select",
+            "FieldOptions": [
+                "N",
+                "Y"
+            ]
+        }
+    ],
+    "Steps": [
+        {
+            "Type": "Check",
+            "Name": "Instance Does not Exist",
+            "SQL": "SELECT COUNT(*) FROM INS WHERE InstanceCode = :InstanceCode"
+        },
+        {
+            "Type": "Check",
+            "Name": "Tenant Does not Exist",
+            "SQL": "SELECT COUNT(*) FROM INS INNER JOIN TNT ON INS.InstanceID = TNT.InstanceID WHERE INS.InstanceCode = :InstanceCode AND TNT.TenantCode = :TenantCode"
+        },
+        {
+            "Type": "Check",
+            "Name": "Warehouse Does not Exist",
+            "SQL": "SELECT COUNT(*) FROM INS INNER JOIN WHS ON INS.InstanceID = WHS.InstanceID WHERE INS.InstanceCode = :InstanceCode AND WHS.WarehouseCode = :WarehouseCode"
+        },
+        {
+            "Type": "Get",
+            "Name": "Global Variables",
+            "SQL": "SELECT INS.InstanceID, WHS.WarehouseID, TNT.TenantID, CONCAT(WHS.WarehouseCode,'_',TNT.TenantCode,'_',NOW()) AS BuiltByMvi FROM INS INNER JOIN WHS ON INS.InstanceID = WHS.InstanceID INNER JOIN TNT ON INS.InstanceID = TNT.InstanceID  WHERE INS.InstanceCode = :InstanceCode AND WHS.WarehouseCode = :WarehouseCode AND TNT.TenantCode = :TenantCode"
+        },
+        {
+            "Type": "Function_UpsertGenericAttributeForRecord",
+            "Name": "Set BultByMVI",
+            "ReferenceIDParameter": "InstanceID",
+            "ReferenceType": "INS",
+            "AttributeName": "BultByMVI",
+            "AttributeValueParameter": "BuiltByMvi"
+        },
+        {
+            "Type": "Command",
+            "Name": "Remove  Global Settings",
+            "SQL": "DELETE FROM `SET` WHERE `SET`.`InstanceID` = :InstanceID AND WarehouseID IS NULL AND TenantID IS NULL AND SettingName NOT LIKE 'dotWMS.APIKey'"
+        },
+        {
+            "Type": "Command",
+            "Name": "Remove  Warehouse Tenant Settings",
+            "SQL": "DELETE FROM `SET` WHERE `SET`.`InstanceID` = :InstanceID AND WarehouseID = :WarehouseID AND TenantID = :TenantID AND SettingName NOT LIKE 'dotWMS.APIKey'"
+        },
+        {
+            "Type": "Command",
+            "Name": "Delete PickTasks Report",
+            "SQL": "DELETE FROM `REP` WHERE `REP`.`InstanceID` = :InstanceID AND REP.ReportCode = 'PickTasks'"
+        },
+        {
+            "Type": "Command",
+            "Name": "Delete Warehouse Tenant DFT",
+            "SQL": "DELETE FROM DFT WHERE DFT.InstanceID = :InstanceID AND DFT.WarehouseID = :WarehouseID AND DFT.TenantID = :TenantID;"
+        },
+        {
+            "Type": "Command",
+            "Name": "Delete Order loop back",
+            "SQL": "DELETE EXP FROM EXP INNER JOIN EXP1 ON EXP1.ExportFileTypeID = EXP.ExportFileTypeID WHERE EXP1.ExportFileTypeFunction = 'PackJobBackorderedItemsSalesOrderXML' AND EXP.InstanceID = :InstanceID AND EXP.WarehouseID = :WarehouseID AND EXP.TenantID = :TenantID;"
+        },
+        {
+            "Type": "Command",
+            "Name": "Delete Receipt loop back",
+            "SQL": "DELETE EXP FROM EXP INNER JOIN EXP1 ON EXP1.ExportFileTypeID = EXP.ExportFileTypeID WHERE EXP1.ExportFileTypeFunction = 'PackJobBackorderedItemsSalesOrderXML' AND EXP.InstanceID = :InstanceID AND EXP.WarehouseID = :WarehouseID AND EXP.TenantID = :TenantID;"
+        },
+        {
+            "Type": "Command",
+            "Name": "Delete Order loop back",
+            "SQL": "DELETE EXP FROM EXP INNER JOIN EXP1 ON EXP1.ExportFileTypeID = EXP.ExportFileTypeID WHERE EXP1.ExportFileTypeFunction = 'PackJobBackorderedItemsSalesOrderXML' AND EXP.InstanceID = :InstanceID AND EXP.WarehouseID = :WarehouseID AND EXP.TenantID = :TenantID;"
+        },
+        {
+            "Type": "Command",
+            "Name": "Delete Receipt loop back",
+            "SQL": "DELETE EXP FROM EXP INNER JOIN EXP1 ON EXP1.ExportFileTypeID = EXP.ExportFileTypeID WHERE EXP1.ExportFileTypeFunction = 'StockReceiptPendingLoopbackXML' AND EXP.InstanceID = :InstanceID AND EXP.WarehouseID = :WarehouseID AND EXP.TenantID = :TenantID;"
+        },
+        {
+            "Type": "Command",
+            "Name": "Create Order DFT",
+            "SQL": "INSERT IGNORE INTO `DFT` (`InstanceID`, `TenantID`, `WarehouseID`, `CustomerCode`, `JobPriority`, `JobType`, `JobComplexityScore`, `LabelTemplate`, `PickMethod`, `PackMethod`, `IsSendASN`, `IsBookinFreight`, `IsDateSensitiveFreight`, `IsTimeSensitiveFreight`, `DeliverWindowTime`, `PackingSlipPaperType`, `PackerMessage`, `FreightSpecialInstructions`) SELECT :InstanceID, :TenantID, :WarehouseID, NULL, '1', 'Order', '1', 'none', :DefaultPickMethod, :DefaultPackMethod, '0', '0', '0', '0',NULL,'none', NULL, NULL FROM DUAL WHERE NOT EXISTS ( SELECT 1 FROM `DFT` WHERE `InstanceID` = :InstanceID AND `WarehouseID` = :WarehouseID AND `TenantID` = :TenantID AND `JobType` = 'Order' );"
+        },
+        {
+            "Type": "Command",
+            "Name": "Create Replenishment DFT",
+            "SQL": "INSERT INTO `DFT` (`DefaultID`, `InstanceID`, `TenantID`, `WarehouseID`, `CustomerCode`, `JobPriority`, `JobType`, `JobComplexityScore`, `LabelTemplate`, `PickMethod`, `PackMethod`, `IsSendASN`, `IsBookinFreight`, `IsDateSensitiveFreight`, `IsTimeSensitiveFreight`, `DeliverWindowTime`, `PackingSlipPaperType`, `PackerMessage`, `FreightSpecialInstructions`) SELECT NULL, :InstanceID, NULL, NULL, NULL, '1', 'Replenishment', '1', 'none', 'Partial', NULL, '0', '0', '0', '0', NULL, 'none', NULL, NULL  FROM DUAL WHERE NOT EXISTS ( SELECT 1 FROM `DFT` WHERE `InstanceID` = :InstanceID AND `JobType` = 'REPLENISHMENT' );"
+        },
+        {
+            "Type": "Command",
+            "Name": "Create Replenishment Series ID",
+            "SQL": "INSERT INTO `SER` (`SeriesType`, `InstanceID`, `SeriesName`, `BeginStr`, `EndStr`, `NextNumber`, `LastNumber`, `WarnNumber`, `ZeroFillToDigits`, `Locked`, `CheckDigit`) SELECT 'Order', :InstanceID, 'Replenishment', 'RPLN', '', '100000001', '999999999', NULL, '9', '0', 'None' FROM DUAL WHERE NOT EXISTS ( SELECT 1 FROM `SER` WHERE `InstanceID` = :InstanceID AND `SeriesName` = 'Replenishment' );"
+        },
+        {
+            "Type": "Command",
+            "Name": "Create Rep for System Tasks",
+            "InsertIDParameter": "ReportID",
+            "SQL": "INSERT INTO `REP` (`InstanceID`,REP.ReportCode, `Trigger`, `RunDays`,  `ReportTitle`, `ReportGroup`, `ReportSQL`, `ReportParameters`, `ReportRecipients`, `ReportConfiguration`, `IsVisible`) VALUES (:InstanceID, 'PickTasks',NULL, NULL, '(MVI) System Internal - RF Tasks', NULL, 'SELECT TaskGroup, TaskName, TaskNumber\r\n\r\nFROM(SELECT UPPER(PCK.JobType) as TaskGroup, CONCAT(\\'[\\',PCK.JobStatus,\\'] - \\',PCK.PackSlipNumber) as TaskName, PackSlipNumber as TaskNumber, PCK.JobStatus AS OrderStatus, PCK.JobPriority AS Priority\r\n\r\n FROM PCK\r\n WHERE PCK.InstanceID = XXXInstanceID \r\n AND PCK.WarehouseID = XXXWarehouseID\r\n AND (PCK.TenantID = XXXTenantID OR XXXTenantID IS NULL)\r\n AND PCK.JobStatus IN (\\'Ready\\',\\'Allocated\\',\\'Picking\\',\\'Packing\\') \r\n AND PCK.JobIsHeld = 0 \r\n AND PCK.WaveID IS NULL\r\n UNION ALL \r\n\r\n SELECT UPPER(WVE.WavePickMethod) as TaskGroup, CONCAT(\\'[\\',WVE.WaveStatus,\\'] - \\',WVE.WaveNumber) as TaskName, WVE.WaveNumber as TaskNumber, WVE.WaveStatus AS OrderStatus, WVE.WavePriority AS Priority\r\n\r\n FROM PCK\r\n INNER JOIN WVE ON PCK.WaveID = WVE.WaveID\r\n WHERE PCK.InstanceID = XXXInstanceID \r\n AND PCK.WarehouseID = XXXWarehouseID\r\n AND (PCK.TenantID = XXXTenantID OR XXXTenantID IS NULL)\r\n AND PCK.JobStatus IN (\\'Ready\\',\\'Allocated\\',\\'Picking\\',\\'Packing\\') \r\n AND PCK.JobIsHeld = 0  GROUP BY WVE.WaveID) AS DATA\r\n \r\n \r\nORDER BY \r\nCASE \r\n WHEN UPPER(TaskGroup) = \\'REPLENISHMENT\\' THEN 0 \r\n ELSE 1 \r\nEND,\r\nTaskGroup,\r\nFIELD(OrderStatus, \\'Ready\\', \\'Allocated\\', \\'Released\\', \\'Picking\\', \\'Packing\\'),\r\nPriority, \r\nTaskNumber\r\n ', '[ {\\\"FieldName\\\":\\\"WarehouseID\\\", \\\"FieldTitle\\\":\\\"Warehouse\\\", \\\"FieldType\\\":\\\"WarehouseID\\\"}, {\\\"FieldName\\\":\\\"TenantID\\\", \\\"FieldTitle\\\":\\\"Tenant\\\", \\\"FieldType\\\":\\\"TenantIDWithNull\\\"} ]', '', NULL, '0')"
+        },
+        {
+            "Type": "Command",
+            "Name": "Update Binding",
+            "SQL": "UPDATE REP SET REP.ReportSQL = REPLACE(REP.ReportSQL,'XXX',':') WHERE REP.InstanceID =:InstanceID AND REP.ReportID = :ReportID"
+        },
+        {
+            "Type": "Get",
+            "Name": "Create Replenishment Series ID",
+            "SQL": "SELECT SER.SeriesID AS ReplenSeriesID FROM SER WHERE SER.SeriesName = 'REPLENISHMENT' AND SER.InstanceID = :InstanceID"
+        },
+        {
+            "Type": "Get",
+            "Name": "Get Tasks Series ID",
+            "SQL": "SELECT REP.ReportID AS TaskReportID FROM REP WHERE REP.ReportTitle = '(MVI) System Internal - RF Tasks' AND REP.InstanceID = :InstanceID ORDER BY ReportID DESC LIMIT 1 "
+        },
+        {
+            "Type": "Command",
+            "Name": "Standard Settings Global",
+            "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID, 'dotWMS.RBAC', 'RBAC', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'dotWMS.RBAC.HandheldPermissions', 'Handheld Permissions', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'dotWMS.WebUI.KeepSearchBar', 'Keep ULD Screen', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Receipting.ScreenType', 'Receiving Screen Type', 'Select', 'MultiULD,Standard', 'MultiULD', '0' ), ( :InstanceID, 'Stock.ULDManagement', '', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Stock.TradeItemManagementType', 'Item Master Data Screen Type', 'Select', 'Basic,Advanced', 'Advanced', '0' ), ( :InstanceID, 'Receipting.Manage.ShowULDs', 'Show ULDs on receipt', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Stock.BinCount', 'BIN Count', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Receipting.HoldForSupervisorCloseApproval', 'Supervisor Approval', 'Select', 'Yes,No', 'No', '0' ), ( :InstanceID, 'Receipting.HoldForSupervisorCloseApproval.IfNotAllMatches', 'Short Approval', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Picking.ListItemsByName', 'Picking List Items By Name', 'Text', '', 'Both', '0' ), ( :InstanceID, 'Receipting.ListItemsByName', 'Receipting List Items By Name', 'Text', '', 'Both', '0' ), ( :InstanceID, 'Packing.ListItemsByName', 'Packing List Items By Name', 'Text', '', 'Both', '0' ), ( :InstanceID, 'Packing.RemoveEmptyLogisticUnits', 'Remove Empty Logistic Units', 'Text', '', 'Both', '0' ), ( :InstanceID, 'SSCC.Audit.ShowItemName', 'SSCC List Items By Name', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Stock.ReplenishmentOrders', 'Replenishment Orders', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Shipping.JobManagement.ShowJobPriority', 'Show Job Priority', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Stock.ReplenishmentOrders.NumberingSequence', 'Replenishment Orders Series ID', 'Numeric', '', :ReplenSeriesID, '0' ), ( :InstanceID, 'Tasks.ReportID', 'Tasks Linked Report', 'Numeric', '', 'PickTasks', '0' ), ( :InstanceID, 'Packing.WebUI.RequireCancelReason', 'Require Cancel Reason', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'PackJob.AllowCancelAfterPicking', 'Allow Cancel After Picking', 'Select', 'Yes,No', 'No', '0' ), ( :InstanceID, 'Shipping.AllowHoldJob', 'Allow Hold Job', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Shipping.AllowUnholdJob', 'Allow Unhold Job', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'SLARuleManagement.Active', 'SLA Rule Management Active', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Stock.HoldManagement', 'Stock Hold Management', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Shipping.JobManagement.DisplayDeliveryWindowClose', 'Display Delivery Window Close', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Shipping.JobManagement.DisplayDeliveryWindowOpen', 'Display Delivery Window Open', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Shipping.AllowManifestByTenant', 'Allow Manifest By Tenant', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Stock.ShowItemName', 'Show Item Name', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'ProductLookup.ShowFixedBin', 'Show Fixed Bin', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'dotWMS.Items.ManagePickfaceMinMax', 'Manage Pickface Min Max', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Stock.DestroyULD.BlockIfHasItems', 'Block Destroy if Has Items', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Picking.PrintLogisticUnitLabels', 'PrintLogisticUnitLabels', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Shipping.JobManagement.PrintPickTicket', 'PrintPickTicket', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'BulkUpload.Active', 'BulkUpload.Active', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Packing.WebUI.ShowSOH', 'Packing.WebUI.ShowSOH', 'Select', 'Yes,No', 'Yes', '0' )"
+        },
+        {
+            "Type": "Command",
+            "Name": "Standard Settings Warehouse Tenant Specific",
+            "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID,:WarehouseID, :TenantID, 'Packing.InferTrackersFromPick', 'Packing Infer Trackers', 'Text', NULL, 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'BinCount.AutoLoad', 'Blind Count', 'Text', NULL, 'No', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Shipping.CartonPacking.GTINQuantityRequired', 'Disable Pack Single Scan', 'Text', NULL, 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.PickingBinSource', 'Picking Bin Source', 'Text', NULL, 'Internally Managed Dynamic Bins', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Stock.ULDAdjustAutoLoadContents', '', 'Text', NULL, 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Inventory.DirectedPutaway', '', 'Text', NULL, 'BestAvailable_CBM', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.AutoSelectBatchIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.BestBeforeDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.BestBeforeDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.ExpiryDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.ExpiryDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.PackagingDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.PackagingDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.PresentListOfBatchCodes', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.ProductionDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.ProductionDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.SellByDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'InlinePicking.ULD.SellByDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Putaway.AskPickingBay', '', 'Select', 'Yes,No', 'No', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Putaway.PromptMergeULD', '', 'Select', 'Yes,No', 'Yes', '0' ),( :InstanceID,:WarehouseID, :TenantID, 'Putaway.MergeULDOnEmpty', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.AllowMarkPickFutile', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.AllowMarkPickFutile.CreateCYCU', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.AllowUnpicking', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.TreeView', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.BestBeforeDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.BestBeforeDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.ExpiryDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.ExpiryDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.PackagingDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.PackagingDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.PresentListOfBatchCodes', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.ProductionDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.ProductionDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.SellByDate.AutoSelectIfOnlyOne', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Picking.ULD.SellByDate.PresentList', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Shipping.Packing.ShowHeaderDetails', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Receipting.ClearULDAfterScan', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Receipting.CreateULDOnInboundSSCCScan', '', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID,:WarehouseID, :TenantID, 'Shipping.AllowPDTChangeCarrier', '', 'Select', 'Yes,No', 'No', '0' )"
+        },
+        {
+            "Type": "Command",
+            "Name": "Create PickingMethodology",
+            "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID,:WarehouseID, :TenantID, 'Picking.PickingMethodology', 'Picking Methodology', 'Text', NULL, :PickingMethodology, '0' )"
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "DangerousGoods",
+            "SQL": "SELECT CASE WHEN :DangerousGoods = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create DangerousGoods",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'dotWMS.Items.DangerousGoods', 'Dangerous Goods Management', 'Select', 'Basic,Advanced', 'Advanced', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "ItemTrackers",
+            "SQL": "SELECT CASE WHEN :ItemTrackers = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create ItemTrackers Global",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'dotWMS.Items.BatchControl', 'Batch Control Management', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.BestBeforeDate', 'BestBeforeDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.ExpiryDate', 'ExpiryDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.IsAutoPickPackItem', 'IsAutoPickPackItem', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.IsNonInventory', 'IsNonInventory', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.PackagingDate', 'PackagingDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.ProductionDate', 'ProductionDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.SellByDate', 'SellByDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'dotWMS.Items.SerialControl', 'SerialControl', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Stock.BlockDuplicateSerials', 'SerialControl', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "ManualItem",
+            "SQL": "SELECT CASE WHEN :ManualItem = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create ManualItem Warehouse Tenant Specific",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`,  `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'dotWMS.AllowManualItemSelect', 'Manual Item', 'Text', NULL, 'Yes', '0' ),( :InstanceID, :WarehouseID, :TenantID, 'ManualItemSelect.DisplayField', 'Manual Item Display Field', 'Text', NULL, 'ItemName', '0' ),( :InstanceID, :WarehouseID, :TenantID, 'ManualProducts.ToPickProductsOnly', 'Manual Products to Pick Item', 'Text', NULL, 'Yes', '0' ),( :InstanceID, :WarehouseID, :TenantID, 'ManualProducts.ToReceiptProductsOnly', 'Manual Products to Receipt Item', 'Text', NULL, 'Yes', '0' ),( :InstanceID, :WarehouseID, :TenantID, 'ManualProducts.ToPackProductsOnly', 'To Pack Products Only', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "StockAdjustmentReasonCodes",
+            "SQL": "SELECT CASE WHEN :StockAdjustmentReasonCodes != '' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create StockAdjustmentReasonCodes Warehouse Tenant Specific",
+                    "SQL": "INSERT IGNORE INTO `SET` (InstanceID, WarehouseID, TenantID, SettingName, SettingDescription, SettingType, SettingConstraints, SettingValue, UserEditable) SELECT :InstanceID, :WarehouseID, :TenantID, 'Stock.ULDManagement.RequireCommentOnAdjust.ReasonCodes', 'ReasonCodes', 'Text', NULL, result, '0' FROM ( SELECT GROUP_CONCAT( CONCAT( SUBSTRING_INDEX(SUBSTRING_INDEX(:StockAdjustmentReasonCodes, ',', n), ',', -1), ':', n ) ORDER BY n SEPARATOR '|' ) AS result FROM ( SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 ) AS numbers WHERE n <= 1 + LENGTH(:StockAdjustmentReasonCodes) - LENGTH(REPLACE(:StockAdjustmentReasonCodes, ',', '')) ) AS subquery UNION ALL SELECT :InstanceID, :WarehouseID, :TenantID, 'Stock.ULDManagement.RequireCommentOnAdjust', 'ReasonCodes', 'Text', NULL, 'Yes', '0';"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "StockHoldReasons",
+            "SQL": "SELECT CASE WHEN :StockHoldReasons != '' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create StockAdjustmentReasonCodes Warehouse Tenant Specific",
+                    "SQL": "INSERT IGNORE INTO `SET` ( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID, :WarehouseID, :TenantID, 'Stock.ULDManagement.HoldReasons', 'HoldReasons', 'Text', NULL, :StockHoldReasons, '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "RandomReceipts",
+            "SQL": "SELECT CASE WHEN :RandomReceipts = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create RandomReceipts",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'Receipting.RandomReceipts', 'Random Receipts', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Receipting.CaptureRandomReceiptReference', 'Random Receipts Reference', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "ManualReceipts",
+            "SQL": "SELECT CASE WHEN :ManualReceipts = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create ManualReceipts",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'Receipting.WebUI.CreateReceipts', 'Manual Receipts', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "BulkReceipts",
+            "SQL": "SELECT CASE WHEN :BulkReceipts = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create BulkReceipts",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'BulkUpload.Active', 'Bulk Receipt', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Receipting.BulkReceive.DefaultMethod', 'Bulk Receipt Type', 'Text', NULL, 'Web', '0' ),( :InstanceID, 'Receipting.BulkReceive.AllowChoice', 'Bulk Receipt Choice', 'Text', NULL, 'No', '0' ),( :InstanceID, 'Stock.BulkReceive', 'Bulk Receipt', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Receipting.WebUI.CloseJobInProgress', 'Close Receipt', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "EditReceipts",
+            "SQL": "SELECT CASE WHEN :EditReceipts = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create EditReceipts",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'Receipting.AllowEditJob', 'Edit Receipts', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Receipting.AllowEdit.Statuses', 'Edit Receipts', 'Text', NULL, '[\"Pending\", \"Received At Dock\"]', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "ReceiptLoopback",
+            "SQL": "SELECT CASE WHEN :ReceiptLoopback = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create ReceiptLoopback",
+                    "SQL": "INSERT INTO EXP (InstanceID, WarehouseID, TenantID, ExportFileTypeID, ExportFileSaveDriver, ExportFileSavePath, ExportFileConditions)\r\nSELECT \r\n    :InstanceID, \r\n    :WarehouseID, \r\n    :TenantID, \r\n    EXP1.ExportFileTypeID, \r\n    'HTTP Push', \r\n    CONCAT('https:\/\/', SUBSTRING_INDEX(SUBSTRING_INDEX(@@hostname, '-', 2), '-', -1), '.dotwms.com\/api\/1.0\/UpsertSimpleReceipt\/'), \r\n    '[{\"Column\":\"IsRandomReceipt\",\"Value\":\"0\",\"Negate\":false},{\"Column\":\"Flag_AllMatches\",\"Value\":\"0\",\"Negate\":false}]'\r\nFROM EXP1\r\nWHERE EXP1.ExportFileTypeFunction = 'StockReceiptPendingLoopbackXML' \r\nAND EXP1.InstanceID IS NULL"
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Disable short approval because of loopback",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, WarehouseID, TenantID,`SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Receipting.HoldForSupervisorCloseApproval.IfNotAllMatches', 'Receipting.HoldForSupervisorCloseApproval.IfNotAllMatches', 'Text', NULL, 'No', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "CarrierEstimation",
+            "SQL": "SELECT CASE WHEN :CarrierEstimation = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create CarrierEstimation",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'Shipping.ShowCarrierCostEstimates', 'ShowCarrierCostEstimates', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ShowCarrierCostEstimates.SortByCheapestEstimate', 'SortByCheapestEstimate', 'Text', NULL, 'Yes', '0' ),  ( :InstanceID, 'Shipping.EstimateJobFreightCostView.Active', 'Shipping Estimate Job Freight Cost View', 'Select', 'Yes,No', 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Command",
+            "Name": "Create BlockOverReceipts",
+            "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, WarehouseID, TenantID,`SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Receipting.BlockOverReceipts', 'Manual Receipts', 'Text', NULL, CASE WHEN :BlockOverReceipt LIKE 'N' THEN 'No' ELSE 'Yes' END, '0' )"
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "PutawayMergeGeneral",
+            "SQL": "SELECT CASE WHEN :PutawayMergeBulk = 'Y' THEN 1 WHEN :PutawayMergePicking = 'Y' THEN 1   ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create CreateNextGenGeneral",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, WarehouseID, TenantID,`SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Putaway.AutoMergeIfSingleULD', 'Putaway Merge Bulk', 'Text', NULL, 'Yes', '0' ),( :InstanceID, NULL, NULL, 'Stock.ULDManagement.AllowLocationMove', 'Stock.ULDManagement.AllowLocationMove', 'Text', NULL, 'No', '0' )"
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Create PutawayMergeBulk",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, WarehouseID, TenantID,`SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Putaway.AutoMergeIfSingleULD.Bulk', 'Putaway Merge Bulk', 'Text', NULL, CASE WHEN :PutawayMergeBulk LIKE 'N' THEN 'No' ELSE 'Yes' END, '0' )"
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Create PutawayMergePicking",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, WarehouseID, TenantID,`SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Putaway.AutoMergeIfSingleULD.Picking', 'Putaway Merge Picking', 'Text', NULL, CASE WHEN :PutawayMergePicking LIKE 'N' THEN 'No' ELSE 'Yes' END, '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "ManualOrders",
+            "SQL": "SELECT CASE WHEN :ManualOrders = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create Orders Series ID",
+                    "SQL": "INSERT INTO `SER` (`SeriesType`, `InstanceID`, `SeriesName`, `BeginStr`, `EndStr`, `NextNumber`, `LastNumber`, `WarnNumber`, `ZeroFillToDigits`, `Locked`, `CheckDigit`) SELECT 'Order', :InstanceID, 'Orders', 'ORDR', '', '100000001', '999999999', NULL, '9', '0', 'None' FROM DUAL WHERE NOT EXISTS ( SELECT 1 FROM `SER` WHERE `InstanceID` = :InstanceID AND `SeriesName` = 'Orders' );"
+                },
+                {
+                    "Type": "Get",
+                    "Name": "Create Orders Series ID",
+                    "SQL": "SELECT SER.SeriesID AS OrderSeriesID FROM SER WHERE SER.SeriesName = 'ORDERS' AND SER.InstanceID = :InstanceID"
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Create ManualOrders",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, 'Shipping.ManualOrders.Active', 'Manual Orders', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ManualCreateJob.ShowDeliverWindowCloseDate', 'ShowDeliverWindowCloseDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ManualCreateJob.ShowDeliverWindowOpenDate', 'ShowDeliverWindowOpenDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ManualCreateJob.ShowDeliveryCompany', 'ShowDeliveryCompany', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ManualCreateJob.ShowOrderDate', 'ShowOrderDate', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ManualCreateJob.ShowPackerMessage', 'ShowPackerMessage', 'Text', NULL, 'Yes', '0' ),( :InstanceID, 'Shipping.ManualOrders.NumberingSequence', 'NumberingSequence', 'Numeric', NULL, :OrderSeriesID, '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "EditOrders",
+            "SQL": "SELECT CASE WHEN :EditOrders = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create EditOrders",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID, 'Packing.WebUI.EditablePackerMessage', 'Edit Packer Message', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.WebUI.EditableSpecialInstructions', 'EditableSpecialInstructions', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.WebUI.EditLines', 'EditLines', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.WebUI.EditLines.WhenPicking', 'EditLines', 'Text', NULL, 'No', '0' ), ( :InstanceID, 'Shipping.JobManagement.EditableDeliveryDue', 'EditableDeliveryDue', 'Text', NULL, 'No', '0' ), ( :InstanceID, 'Shipping.API.BlockChangesAfterReadyStatus', 'BlockChangesAfterReadyStatus', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Shipping.AllowAddressChange', 'AllowAddressChange', 'Text', NULL, 'Yes', '0' );"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "AllowCancelAfterPicking",
+            "SQL": "SELECT CASE WHEN :AllowCancelAfterPicking = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Subroutine",
+                    "Name": "Check if we need to create the ULD",
+                    "SQL": "SELECT COUNT(*) FROM ULD WHERE ULD.InstanceID = :InstanceID AND ULD.WarehouseID = :WarehouseID AND ULD.TenantID = :TenantID AND ULD.Barcode = 'ORDERCANCEL'",
+                    "ElseSteps": [
+                        {
+                            "Type": "Command",
+                            "Name": "Create ULD",
+                            "SQL": "INSERT INTO ULD (ULD.InstanceID, ULD.WarehouseID, ULD.TenantID, ULD.Barcode, ULD.Status, ULD.CreateDate, ULD.CreateDateUTC, ULD.ULDHeight, ULD.ULDWidth, ULD.ULDDepth, ULD.ULDWeight) (SELECT :InstanceID, :WarehouseID, :TenantID, 'ORDERCANCEL', 'Bulk', NOW(), UTC_TIMESTAMP(), 0,0,0,0)",
+                            "InsertIDParameter": "NEWID"
+                        },
+                        {
+                            "Type": "Function_UpsertGenericAttributeForRecord",
+                            "Name": "Set To Indestructible",
+                            "ReferenceIDParameter": "NEWID",
+                            "ReferenceType": "ULD_HIDDEN",
+                            "AttributeName": "Indestructible",
+                            "AttributeValue": "Yes"
+                        }
+                    ]
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Create AllowCancelAfterPicking",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, WarehouseID, TenantID,`SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Picking.ReturnToULDOnCancel', 'Picking.ReturnToULDOnCancel', 'Text', NULL, 'ORDERCANCEL', '0' ),( :InstanceID, :WarehouseID, :TenantID,'PackJob.AllowCancelAfterPicking', 'PackJob.AllowCancelAfterPicking', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "OrderLoopback",
+            "SQL": "SELECT CASE WHEN :OrderLoopback = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create OrderLoopback",
+                    "SQL": "INSERT INTO EXP (InstanceID, WarehouseID, TenantID, ExportFileTypeID, ExportFileSaveDriver, ExportFileSavePath, ExportFileConditions) SELECT :InstanceID, :WarehouseID, :TenantID, EXP1.ExportFileTypeID, 'HTTP Push', CONCAT('https:\/\/',SUBSTRING_INDEX(SUBSTRING_INDEX(@@hostname, '-', 2), '-', -1),'.dotwms.com\/api\/1.0\/UpsertSalesOrder\/'), NULL FROM EXP1 WHERE EXP1.ExportFileTypeFunction = 'PackJobBackorderedItemsSalesOrderXML' AND EXP1.InstanceID IS NULL"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "Waving",
+            "SQL": "SELECT CASE WHEN :Waving = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create Wave Series ID",
+                    "SQL": "INSERT INTO `SER` (`SeriesType`, `InstanceID`, `SeriesName`, `BeginStr`, `EndStr`, `NextNumber`, `LastNumber`, `WarnNumber`, `ZeroFillToDigits`, `Locked`, `CheckDigit`) SELECT 'Wave', :InstanceID, 'Wave', 'WVE', '', '100000001', '999999999', NULL, '9', '0', 'None' FROM DUAL WHERE NOT EXISTS ( SELECT 1 FROM `SER` WHERE `InstanceID` = :InstanceID AND `SeriesName` = 'Wave' );"
+                },
+                {
+                    "Type": "Get",
+                    "Name": "Create Wave Series ID",
+                    "SQL": "SELECT SER.SeriesID AS WaveSeriesID FROM SER WHERE SER.SeriesName = 'Wave' AND SER.InstanceID = :InstanceID"
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Update  Wave Series ID",
+                    "SQL": "UPDATE WHS SET WHS.WaveSeriesID = :WaveSeriesID WHERE WHS.InstanceID = :InstanceID AND WHS.WarehouseID = :WarehouseID"
+                },
+                {
+                    "Type": "Command",
+                    "Name": "Create Waving",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES ( :InstanceID, 'WavePick.Active', 'WavePick Active', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowCustomerCode', 'ShowCustomerCode', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowJobType', 'ShowJobType', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowAssignedUser', 'ShowJobType', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.WaveBuilder.ShowPackerMessage', 'ShowPackerMessage', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowAssignedUser', 'ShowAssignedUser', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowPickMethod', 'ShowPickMethod', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowPriority', 'ShowPriority', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'Packing.ReportingWaveStatus.ShowTrolleyNumber', 'ShowTrolleyNumber', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WaveDetail.AllowBulkReprint', 'AllowBulkReprint', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, 'WavePick.CheckATP', 'CheckATP', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WavePick.ATPDropdown', 'CheckATP', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WavePick.PickToCarton.CompleteAfterWave', 'CompleteAfterWave', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'Waves.MarkReleasedOnFirstOpen', 'MarkReleasedOnFirstOpen', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WavePick.ArraySort.CompleteIfSingleItem', 'WavePick.ArraySort.CompleteIfSingleItem', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'WebUI.WaveBuilder.ShowPrinters', 'WebUI.WaveBuilder.ShowPrinters', 'Select', 'Yes,No', 'Yes', '0' ), ( :InstanceID, 'CartonisationSetup.Active', 'CartonisationSetup.Active', 'Select', 'Yes,No', 'Yes', '0' );"
+                },
+				
+				
+				   {
+                    "Type": "Command",
+                    "Name": "Create Cluster EXP1",
+                    "SQL": "INSERT INTO `EXP1` (`ExportFileTypeID`, `InstanceID`, `ExportFileTypeCode`, `TriggerAfter`, `ExportFileTypeName`, `ExportFileTypeFormat`, `ExportFileTypeFunction`, `ExportFileSQL`, `ExportFileNameSQL`, `ExportFileDocumentNumberSQL`, `ExportFileConfiguration`) VALUES (NULL, NULL, NULL, 'WVE_CREATE', 'Wave Ticket', 'Label', 'WaveTicketLabel', NULL, NULL, NULL, NULL) "
+                },
+				   {
+                    "Type": "Command",
+                    "Name": "Create Waving EXP",
+                    "SQL": "INSERT IGNORE INTO `EXP` (`InstanceID`, `TenantID`, `WarehouseID`, `ExportFileTypeID`, `ExportFileSaveDriver`, `ExportFileSavePath`, `ExportFileConditions`, `ExportConfiguration`)  (SELECT :InstanceID,:TenantID, :WarehouseID, EXP1.ExportFileTypeID, 'Label Print', 'SelectedPrinter', NULL, NULL FROM EXP1 WHERE EXP1.ExportFileTypeFunction = 'WaveTicketLabel' AND EXP1.InstanceID IS NULL AND EXP1.TriggerAfter = 'WVE_CREATE' ORDER BY EXP1.ExportFileTypeID DESC LIMIT 1)"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "CreateNextGenGeneral",
+            "SQL": "SELECT CASE WHEN :CartonNextGen = 'Y' THEN 1 WHEN :PalletNextGen = 'Y' THEN 1   ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create CreateNextGenGeneral",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES( :InstanceID, :WarehouseID, :TenantID, 'Shipping.NextGen.SendDefaultHeight', 'SendDefaultHeight', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, :WarehouseID, :TenantID, 'Shipping.NextGen.SendDefaultWeight', 'SendDefaultWeight', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, :WarehouseID, :TenantID, 'Shipping.NextGen.SendDefaultWidth', 'SendDefaultWidth', 'Text', NULL, 'Yes', '0' ), ( :InstanceID, :WarehouseID, :TenantID, 'Shipping.NextGen.SendDefaultDepth', 'SendDefaultDepth', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "FullPalletPicking",
+            "SQL": "SELECT CASE WHEN :FullPalletPicking = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create FullPalletPicking Warehouse Tenant Specific",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES(:InstanceID, :WarehouseID, :TenantID, 'Packing.CreateLogisticUnits.PrePrintForJob', 'CreateLogisticUnits', 'Text', NULL, 'Yes', '0' ),(:InstanceID, :WarehouseID, :TenantID, 'Shipping.JobManagement.PrintLogisticUnits', 'PrintLogisticUnitLabels', 'Text', NULL, 'Yes', '0' ),(:InstanceID, :WarehouseID, :TenantID, 'Picking.PickToLogisticUnit', 'PickToLogisticUnit', 'Text', NULL, 'Yes', '0' ),(:InstanceID, :WarehouseID, :TenantID, 'Picking.AttemptPickFullULD', 'AttemptPickFullULD', 'Text', NULL, 'Yes', '0' )"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "CartonNextGen",
+            "SQL": "SELECT CASE WHEN :CartonNextGen = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create CartonNextGen Warehouse Tenant Specific",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES(:InstanceID, :WarehouseID, :TenantID, 'Shipping.CartonMeasurementMethod', 'Carton NextGen', 'Text', NULL, 'NextGen', '0' );"
+                }
+            ]
+        },
+        {
+            "Type": "Subroutine",
+            "Name": "PalletNextGen",
+            "SQL": "SELECT CASE WHEN :PalletNextGen = 'Y' THEN 1 ELSE 0 END",
+            "Steps": [
+                {
+                    "Type": "Command",
+                    "Name": "Create PalletNextGen Warehouse Tenant Specific",
+                    "SQL": "INSERT IGNORE INTO `SET`( `InstanceID`, `WarehouseID`, `TenantID`, `SettingName`, `SettingDescription`, `SettingType`, `SettingConstraints`, `SettingValue`, `UserEditable` ) VALUES(:InstanceID, :WarehouseID, :TenantID, 'Shipping.PalletMeasurementMethod', 'Pallet NextGen', 'Text', NULL, 'NextGen', '0' );"
+                }
+            ]
+        },
+        {
+            "Type": "Query",
+            "Name": "",
+            "SQL": "SELECT 'COMPLETE <3'"
+        }
+    ]
+}
